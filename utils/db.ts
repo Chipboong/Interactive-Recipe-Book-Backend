@@ -6,7 +6,7 @@ if (!DB_URI) {
 export const pool: mysql.Pool = mysql.createPool({
     uri: DB_URI,
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: 5,
     queueLimit: 0,
 });
 export async function close_pool(pool: mysql.Pool) {
