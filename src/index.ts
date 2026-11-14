@@ -2,9 +2,9 @@ import dotenv from "dotenv";
 import express, { type Express, type Request, type Response } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import router from "./routes/route.ts";
 import { errorHandler } from "./middleware/error.ts";
-
 
 dotenv.config();
 const PORT = process.env.PORT;
@@ -14,7 +14,7 @@ if (!PORT) {
 const app: Express = express();
 app.use(bodyParser.json());
 app.use(cors());
-
+app.use(cookieParser());
 // we will implement it using route.
 // the api shall follow this structure
 // /api/version/route e.g. /api/v1/login
@@ -35,9 +35,13 @@ app.use("/api/v1", router);
 //     res.status(404); // would be best to have default page for it.
 // });
 app.all("/{*any}", (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: "NOT_FOUND", message: "Route not found." });
+    res.status(404).json({
+        success: false,
+        error: "NOT_FOUND",
+        message: "Route not found.",
+    });
 });
 app.use(errorHandler);
 app.listen(Number.parseInt(PORT), () => {
-    console.log(`Server start on port: ${PORT}`)
+    console.log(`Server start on port: ${PORT}`);
 });
