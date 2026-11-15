@@ -18,7 +18,9 @@ export const UP_DB: string[] = [
     `
         CREATE TABLE IF NOT EXISTS sessions(
             id INT AUTO_INCREMENT PRIMARY KEY,
-            session_id VARCHAR(70) NOT NULL,
+            session_id VARCHAR(192) NOT NULL,
+            refresh_id VARCHAR(192) NOT NULL,
+            refresh_exp_date DATETIME NOT NULL,
             exp_date DATETIME NOT NULL,
             user_id INT UNIQUE NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
