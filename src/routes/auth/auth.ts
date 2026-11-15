@@ -5,6 +5,7 @@ import { email_validate, password_validate } from "../../../utils/validator.ts";
 import {
     add_sessions,
     add_user,
+    delete_token_by_id,
     get_refresh_token,
     get_user,
     get_user_by_id,
@@ -15,6 +16,7 @@ import {
     gen_refresh_token,
     verify_refresh_token,
 } from "./helper.ts";
+import { auth_middleware, type AuthRequest } from "../../middleware/auth.ts";
 const authRoute = express.Router();
 
 authRoute.post("/register", async (req: Request, res: Response) => {
@@ -77,6 +79,28 @@ authRoute.post("/register", async (req: Request, res: Response) => {
     }
     return res.status(201).json(result);
 });
+authRoute.delete(
+    "/logout",
+    auth_middleware,
+    async (req: AuthRequest, res: Response) => {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                error: "UNAUTHORIZED",
+                message: "Invalid email or password",
+            });
+        }
+        // If the code execute here, it mean the user is valid.
+        await delete_token_by_id(pool, user.user_id);
+
+        res.clearCookie("refresh_token");
+        res.clearCookie("access_token");
+        return res.status(200).json({
+            success: true,
+        });
+    },
+);
 authRoute.post("/login", async (req: Request, res: Response) => {
     const { email, password } = (req.body ?? {}) as Partial<AuthLoginBody>;
 
