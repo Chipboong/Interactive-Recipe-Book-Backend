@@ -32,7 +32,7 @@ export const UP_DB: string[] = [
             description TEXT NOT NULL,
             prep_time_mins TEXT NOT NULL,
             ingredient TEXT NOT NULL,
-            image BLOB,
+            image MEDIUMBLOB NULL,
             status ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'draft',
             user_id INT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
