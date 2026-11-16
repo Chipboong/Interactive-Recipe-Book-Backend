@@ -79,7 +79,7 @@ export async function add_sessions(
             exp_date,
             user_id
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, FROM_UNIXTIME(?), FROM_UNIXTIME(?), ?)
         ON DUPLICATE KEY UPDATE
             session_id = VALUES(session_id),
             refresh_id = VALUES(refresh_id),

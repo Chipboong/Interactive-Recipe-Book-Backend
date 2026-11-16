@@ -104,7 +104,7 @@ function verify_token<T extends BasePayload>(
         const data = payload as Record<string, unknown>;
 
         if (
-            typeof data.user_id !== "string" ||
+            typeof data.user_id !== 'number' ||
             !Number.isSafeInteger(data.iat) ||
             !Number.isSafeInteger(data.exp) ||
             data.type !== expected_type
