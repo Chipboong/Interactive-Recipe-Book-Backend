@@ -54,6 +54,15 @@ export async function get_refresh_token(pool: mysql.Pool, user_id: string) {
         refreshId: token.refresh_id,
     };
 }
+export async function delete_token_by_id(pool: mysql.Pool, user_id: string) {
+    const sql = `
+        DELETE FROM sessions
+        WHERE user_id = ?
+    `;
+    const [rows] = await pool.execute<ResultSetHeader>(sql, [user_id]);
+
+    return rows.affectedRows;
+}
 export async function add_sessions(
     pool: mysql.Pool,
     sessionId: string,
@@ -70,7 +79,7 @@ export async function add_sessions(
             exp_date,
             user_id
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, FROM_UNIXTIME(?), FROM_UNIXTIME(?), ?)
         ON DUPLICATE KEY UPDATE
             session_id = VALUES(session_id),
             refresh_id = VALUES(refresh_id),
