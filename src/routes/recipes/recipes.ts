@@ -8,7 +8,8 @@ const recipesRoute : Router = Router();
 recipesRoute.route("/")
 .get(async (req, res) => {
     const [result] = await getRecipes(pool);
-    res.json({result});
+    console.log(result)
+    res.json({...result});
 })
 .post(uploadSingleImage, async (req, res) => {
     const imageBuffer = req.file ? req.file.buffer : null;
