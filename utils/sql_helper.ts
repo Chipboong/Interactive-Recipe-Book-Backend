@@ -138,19 +138,7 @@ export async function add_user(
     }
 }
 
-export async function getRecipe(pool: mysql.Pool) {
-    const query = "SELECT * FROM recipes";
-    try{
-    const [result] = await pool.execute<RowDataPacket[]>(query);
-    console.log(result)
-    return result;
-} catch (err) {
-    return "faild";
-}
 
-    
-    
-}
 export async function get_user(
     pool: mysql.Pool,
     email: string,
