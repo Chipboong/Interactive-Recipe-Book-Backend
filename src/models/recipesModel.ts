@@ -16,7 +16,7 @@ export interface RecipePayload {
     user_id: number;
 }
 
-export async function getRecipe(pool: mysql.Pool) {
+export async function getRecipes(pool: mysql.Pool) {
     const query = "id, title, description, category, prep_time_mins, status, user_id, created_at FROM recipe";
     try{
     const [recipes] = await pool.execute<RowDataPacket[]>(query);
@@ -37,6 +37,25 @@ export async function getRecipeById(pool: mysql.Pool, id: number) {
 }
 }
  
-export async uploadRecipe(data : RecipePayload){
+export async function uploadRecipe(pool: mysql.Pool , data : RecipePayload) {
+    const stmt = `INSERT INTO recipes
+    (title, description, category, prep_time_mins, ingredient, image, status, user_id) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const values = [
+        data.title,
+        data.description,
+        data.category,
+        data.prep_time_mins,
+        data.ingredient,
+        data.image,
+        data.status || 'draft', 
+        data.user_id
+    ];
+    try{
+        const [ result ] = await pool.execute<ResultSetHeader>(stmt,[values]);
+        return result.insertId;
+    } catch (err: any) {
+        throw err;
+    }
 
 }
