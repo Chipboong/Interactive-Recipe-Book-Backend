@@ -52,7 +52,7 @@ export async function uploadRecipe(pool: mysql.Pool , data : RecipePayload) {
         data.user_id
     ];
     try{
-        const [ result ] = await pool.execute<ResultSetHeader>(stmt,[...values]);
+        const [ result ] = await pool.execute<ResultSetHeader>(stmt,values);
         return result.insertId;
     } catch (err: any) {
         throw err;
