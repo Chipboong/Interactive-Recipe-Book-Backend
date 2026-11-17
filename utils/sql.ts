@@ -28,17 +28,18 @@ export const UP_DB: string[] = [
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );`,
     `
-        CREATE TABLE IF NOT EXISTS recipes(
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(50) NOT NULL,
-            description TEXT NOT NULL,
-            prep_time_mins TEXT NOT NULL,
-            ingredient TEXT NOT NULL,
-            image MEDIUMBLOB NULL,
-            status ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'draft',
-            user_id INT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        );`,
+        CREATE TABLE IF NOT EXISTS recipes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    prep_time_mins TEXT NOT NULL,
+    ingredient TEXT NOT NULL,
+    image MEDIUMBLOB NULL,
+    status ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'draft',
+    user_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);`,
 ];

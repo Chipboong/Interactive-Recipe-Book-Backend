@@ -19,6 +19,8 @@ app.use(cookieParser());
 // the api shall follow this structure
 // /api/version/route e.g. /api/v1/login
 
+app.use(router);
+
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello World!");
 });

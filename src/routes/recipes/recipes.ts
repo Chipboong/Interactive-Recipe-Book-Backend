@@ -1,34 +1,40 @@
-import express, {type Request, type Response} from "express"
-import { uploadSingleImage } from "../../middleware/upload.ts"
+import { Router } from 'express';
+import { pool } from '../../../utils/db.ts'
+import { getRecipes, getRecipeById, uploadRecipe, type RecipePayload } from "../../models/recipesModel.ts"
+import { uploadSingleImage } from '../../middleware/upload.ts';
 
-// GUYS, THIS ONE IS FOR TESTING ONLY
-// WILL REMOVE IT LATER 
+const recipesRoute : Router = Router();
 
-const recipesRoute = express.Router()
-
-recipesRoute.post(
-    "/test-upload",
-    uploadSingleImage,
-    (req: Request, res: Response) => {
-        // the image is optional, so "no file" is a valid request.
-        if (!req.file) {
-            return res.json({
-                success: true,
-                message: "No image sent (allowed, image is optional).",
-                fields: req.body,
-            })
-        }
-
-        // we only report details; nothing is saved anywhere.
-        return res.json({
-            success: true,
-            message: "Image accepted.",
-            originalName: req.file.originalname,
-            verifiedType: req.file.mimetype,
-            bytes: req.file.size,
-            fields: req.body
-        })
+recipesRoute.route("/")
+.get(async (req, res) => {
+    const [result] = await getRecipes(pool);
+    console.log(result)
+    res.json({...result});
+})
+.post(uploadSingleImage, async (req, res) => {
+    const imageBuffer = req.file ? req.file.buffer : null;
+    const payload = {...req.body,
+        image: imageBuffer
+    } as RecipePayload;
+    
+    try{
+        const result = await uploadRecipe(pool, payload);
+        if (result) return res.status(201).json({message: "Recipe Uploaded Successfully!"})
+    } catch(err: any) {
+     return res.status(400).json({error: err.message})   
     }
-)
+})
+
+recipesRoute.route("/:id")
+.get(async (req, res)=>{
+    const recipeId : number = Number(req.params.id);
+    try {
+        const recipe = await getRecipeById(pool, recipeId)
+        if (!recipe) return res.status(404).json({error : `Recipe Not Found`})
+        return res.status(200).json(recipe)
+    } catch(err) {
+        return res.status(500).json({ error: "Failed to fetch recipes" })
+    }
+})
 
 export default recipesRoute;
