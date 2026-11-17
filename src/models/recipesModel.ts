@@ -27,7 +27,7 @@ export async function getRecipes(pool: mysql.Pool) {
 }
 
 export async function getRecipeById(pool: mysql.Pool, id: number) {
- const query = "SELECT title, description, category, prep_time_mins, status, user_id, created_at FROM recipes WHERE id = ? LIMIT = 1;";
+ const query = "SELECT title, description, category, prep_time_mins, status, user_id, created_at FROM recipes WHERE id = ? LIMIT 1;";
  try{
     const [rows] = await pool.execute<RowDataPacket[]>(query,[id])
     return rows.length > 0 ? rows[0] : null;
