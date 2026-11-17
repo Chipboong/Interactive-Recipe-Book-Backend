@@ -2,6 +2,7 @@ import mysql, {
     type ResultSetHeader,
     type RowDataPacket,
 } from "mysql2/promise";
+import { type Request } from "express";
 // import { pool } from "../../utils/db.ts"
 
 
@@ -15,11 +16,27 @@ export interface RecipePayload {
     status: string;
     user_id: number;
 }
+export interface RecipeFilter {
+    ingredient?: string;
+    category?: string;
+}
 
-export async function getRecipes(pool: mysql.Pool) {
-    const query = "SELECT id, title, description, category, prep_time_mins, status, user_id, created_at FROM recipes;";
+export async function getRecipes(pool: mysql.Pool, queryData = null) {
+    let query = "SELECT id, title, description, category, prep_time_mins, status, user_id, created_at FROM recipes";
+    const values : any[] = [];
+    if (queryData){
+    const { ingredient, category } = queryData as RecipeFilter;
+    if (category) {
+        query += ' AND category = ?';
+        values.push(category);
+    }
+    if (ingredient) {
+        query +=  "AND JSON_CONTAINS( ? )";
+        values.push(ingredient);
+    }
+}
     try{
-    const [recipes] = await pool.execute<RowDataPacket[]>(query);
+    const [recipes] = await pool.execute<RowDataPacket[]>(query,values);
     return recipes;
 } catch (err:any) {
     return err.message;
@@ -58,4 +75,13 @@ export async function uploadRecipe(pool: mysql.Pool , data : RecipePayload) {
         throw err;
     }
 
+}
+
+export async function deleteRecipe(pool: mysql.Pool, id: number) {
+const stmt = "DELETE FROM recipes WHERE id = ?"
+try{
+    const [result] = await pool.execute<ResultSetHeader>(stmt,[id])
+} catch (err) {
+    throw err
+}
 }
