@@ -22,7 +22,7 @@ export interface RecipeFilter {
 }
 
 export async function getRecipes(pool: mysql.Pool, queryData = null) {
-    let query = "SELECT id, title, description, category, prep_time_mins, status, user_id, created_at FROM recipes";
+    let query = "SELECT id, title, description, category, prep_time_mins, status, user_id, created_at FROM recipes WHERE 1 = 1";
     const values : any[] = [];
     if (queryData){
     const { ingredient, category } = queryData as RecipeFilter;
@@ -77,10 +77,11 @@ export async function uploadRecipe(pool: mysql.Pool , data : RecipePayload) {
 
 }
 
-export async function deleteRecipe(pool: mysql.Pool, id: number) {
-const stmt = "DELETE FROM recipes WHERE id = ?"
+export async function deleteRecipe(pool: mysql.Pool, id: number, userId: number) {
+const stmt = "DELETE FROM recipes WHERE id = ? AND user_id = ?"
 try{
-    const [result] = await pool.execute<ResultSetHeader>(stmt,[id])
+    const [result] = await pool.execute<ResultSetHeader>(stmt,[id,userId]);
+    return result.affectedRows > 0;
 } catch (err) {
     throw err
 }
