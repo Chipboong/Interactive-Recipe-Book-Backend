@@ -13,7 +13,10 @@ if (!PORT) {
 }
 const app: Express = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", 
+  credentials: true,
+}));
 app.use(cookieParser());
 // we will implement it using route.
 // the api shall follow this structure

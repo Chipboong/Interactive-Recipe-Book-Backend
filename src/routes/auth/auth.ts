@@ -164,19 +164,25 @@ authRoute.post("/login", async (req: Request, res: Response) => {
     res.cookie("refresh_token", refresh_token.token, {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 24 * 60 * 60 * 1000,
         path: "/api/v1/auth/refresh",
     });
     res.cookie("access_token", access_token.token, {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 60 * 60 * 1000,
         path: "/",
     });
     return res.status(200).json({
         success: true,
+    });
+});
+authRoute.get("/me", auth_middleware, (req: AuthRequest, res: Response) => {
+    return res.status(200).json({
+        success: true,
+        user: req.user,
     });
 });
 authRoute.post("/refresh", async (req: Request, res: Response) => {
@@ -241,14 +247,14 @@ authRoute.post("/refresh", async (req: Request, res: Response) => {
     res.cookie("refresh_token", refresh_token.token, {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 24 * 60 * 60 * 1000,
         path: "/api/v1/auth/refresh",
     });
     res.cookie("access_token", access_token.token, {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 60 * 60 * 1000,
         path: "/",
     });
