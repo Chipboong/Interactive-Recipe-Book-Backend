@@ -9,7 +9,7 @@ const recipesRoute : Router = Router();
 recipesRoute.route("/")
 .get(async (req, res) => {
     try{
-    const [result] = await getRecipes(pool);
+    const result = await getRecipes(pool);
     console.log(result)
     return res.json(result);
     } catch (err){
