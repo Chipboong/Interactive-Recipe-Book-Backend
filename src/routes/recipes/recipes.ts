@@ -1,49 +1,64 @@
-import { Router, type Response } from 'express';
-import { pool } from '../../../utils/db.ts'
-import { getRecipes, getRecipeById, uploadRecipe,  deleteRecipe, type RecipePayload } from "../../models/recipesModel.ts"
-import { uploadSingleImage } from '../../middleware/upload.ts';
-import { auth_middleware, type AuthRequest } from '../../middleware/auth.ts';
+import { Router, type Response } from "express";
+import { pool } from "../../../utils/db.ts";
+import {
+    getRecipes,
+    getRecipeById,
+    uploadRecipe,
+    deleteRecipe,
+    type RecipePayload,
+    updateRecipe,
+} from "../../models/recipesModel.ts";
+import { uploadSingleImage } from "../../middleware/upload.ts";
+import { auth_middleware, type AuthRequest } from "../../middleware/auth.ts";
 
-const recipesRoute : Router = Router();
+const recipesRoute: Router = Router();
 
-recipesRoute.route("/")
-.get(async (req, res) => {
-    try{
-    const result = await getRecipes(pool);
-    console.log(result)
-    return res.json(result);
-    } catch (err){
-        console.log(err)
-    }
-})
-.post(auth_middleware,uploadSingleImage, async (req, res) => {
-    const imageBuffer = req.file ? req.file.buffer : null;
-    const userId = (req as any)?.user.user_id;
-    const payload = {...req.body,
-        image: imageBuffer,
-        user_id: userId
-    } as RecipePayload;
-    
-    try{
-        const result = await uploadRecipe(pool, payload);
-        if (result) return res.status(201).json({message: "Recipe Uploaded Successfully!"})
-    } catch(err: any) {
-     return res.status(400).json({error: err.message})   
-    }
-})
+recipesRoute
+    .route("/")
+    .get(async (req, res) => {
+        try {
+            const result = await getRecipes(pool);
+            console.log(result);
+            return res.json(result);
+        } catch (err) {
+            console.log(err);
+        }
+    })
 
-recipesRoute.route("/:id")
-.get(async (req, res)=>{
-    const recipeId : number = Number(req.params.id);
-    try {
-        const recipe = await getRecipeById(pool, recipeId)
-        if (!recipe) return res.status(404).json({error : `Recipe Not Found`})
-        return res.status(200).json(recipe)
-    } catch(err) {
-        return res.status(500).json({ error: "Failed to fetch recipes" })
-    }
-})
-.delete(auth_middleware, async (req: AuthRequest, res: Response) => {
+    .post(auth_middleware, uploadSingleImage, async (req, res) => {
+        const imageBuffer = req.file ? req.file.buffer : null;
+        const userId = (req as any)?.user.user_id;
+        const payload = {
+            ...req.body,
+            image: imageBuffer,
+            user_id: userId,
+        } as RecipePayload;
+
+        try {
+            const result = await uploadRecipe(pool, payload);
+            if (result)
+                return res
+                    .status(201)
+                    .json({ message: "Recipe Uploaded Successfully!" });
+        } catch (err: any) {
+            return res.status(400).json({ error: err.message });
+        }
+    });
+
+recipesRoute
+    .route("/:id")
+    .get(async (req, res) => {
+        const recipeId: number = Number(req.params.id);
+        try {
+            const recipe = await getRecipeById(pool, recipeId);
+            if (!recipe)
+                return res.status(404).json({ error: `Recipe Not Found` });
+            return res.status(200).json(recipe);
+        } catch (err) {
+            return res.status(500).json({ error: "Failed to fetch recipes" });
+        }
+    })
+    .delete(auth_middleware, async (req: AuthRequest, res: Response) => {
         if (!req.user) {
             return res.status(401).json({
                 success: false,
@@ -51,7 +66,7 @@ recipesRoute.route("/:id")
                 message: "Authentication required.",
             });
         }
-        const userId = Number(req.user.user_id)
+        const userId = Number(req.user.user_id);
         const recipeId = Number(req.params.id);
         if (Number.isNaN(recipeId)) {
             return res.status(400).json({ error: "Invalid recipe ID" });
@@ -64,10 +79,64 @@ recipesRoute.route("/:id")
                     .status(404)
                     .json({ error: "Recipe not found or not owned by user" });
             }
-            return res.status(200).json({ message: "Recipe deleted successfully" });
+            return res
+                .status(200)
+                .json({ message: "Recipe deleted successfully" });
         } catch (err) {
             return res.status(500).json({ error: "Failed to delete recipe" });
         }
     });
+recipesRoute
+    .route("/:id")
+    .put(
+        auth_middleware,
+        uploadSingleImage,
+        async (req: AuthRequest, res: Response) => {
+            if (!req.user) {
+                return res.status(401).json({
+                    error: "Authentication required.",
+                });
+            }
 
+            const recipeId = Number(req.params.id);
+            const userId = Number(req.user.user_id);
+
+            if (Number.isNaN(recipeId)) {
+                return res.status(400).json({ error: "Invalid recipe ID" });
+            }
+
+            try {
+                const payload = {
+                    title: req.body.title,
+                    description: req.body.description,
+                    category: req.body.category,
+                    prep_time_mins:
+                        req.body.prep_time_mins ?? req.body.prepTime,
+                    ingredient: req.body.ingredient ?? req.body.keyIngredients,
+                    image: req.file ? req.file.buffer : null,
+                };
+
+                const updated = await updateRecipe(
+                    pool,
+                    recipeId,
+                    userId,
+                    payload,
+                );
+
+                if (!updated) {
+                    return res.status(404).json({
+                        error: "Recipe not found or not owned by user",
+                    });
+                }
+
+                return res.status(200).json({
+                    message: "Recipe updated successfully",
+                });
+            } catch (err: any) {
+                return res.status(400).json({
+                    error: err.message || "Failed to update recipe",
+                });
+            }
+        },
+    );
 export default recipesRoute;
