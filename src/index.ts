@@ -17,6 +17,7 @@ app.use(cors({
   origin: "http://localhost:5173", 
   credentials: true,
 }));
+app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
 // we will implement it using route.
 // the api shall follow this structure
