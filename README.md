@@ -17,6 +17,7 @@ Built with Node.js, Express.js, TypeScript, and MySQL, this backend provides RES
 - [Running the Application](#running-the-application)
 - [Demo Account](#demo-account)
 - [API Endpoints](#api-endpoints)
+- [Test Case](#testing)
 - [Known Limitations](#known-limitations)
 - [Contribution Statement](#contribution-statement)
 
@@ -365,6 +366,31 @@ http://localhost:3000/api/v1
 | POST | `/recipes` | Create a new recipe | Yes |
 | DELETE | `/recipes/:id` | Delete an owned recipe | Yes |
 
+## Testing
+
+The following table outlines the main test cases for the application.
+
+| No. | Test Case | Expected Result | Status |
+|---|---|---|---|
+| 1 | Register with valid information | User account is created successfully | Verified (PASS) |
+| 2 | Register with an existing username or email | Duplicate account error is returned | Verified (PASS) |
+| 3 | Login with valid credentials | User is authenticated successfully | Verified (PASS) |
+| 4 | Login with incorrect credentials | Unauthorized error is returned | Verified (PASS) |
+| 5 | Create a recipe with valid information | Recipe is created and saved successfully | Verified (PASS) |
+| 6 | Create a recipe with an empty title or invalid category | Validation error is returned | Verified (PASS) |
+| 7 | Browse, search, and filter recipes | Matching recipe records are returned | Verified (PASS) |
+| 8 | Update and delete an owned recipe | Recipe is updated or deleted successfully | Verified (PASS) |
+| 9 | Attempt to update or delete another user's recipe | Unauthorized request is rejected and the original recipe remains unchanged | Verified (PASS) |
+| 10 | Upload a valid image | Image is uploaded successfully and associated with the recipe | Verified (PASS) |
+| 11 | Upload an unsupported or oversized image | File upload is rejected with an appropriate error message | Verified (PASS) |
+| 12 | Logout from an authenticated session | Authentication cookies and session are cleared | Verified (PASS) |
+| 13 | Access a protected endpoint without authentication | Unauthorized response is returned | Verified (PASS) |
+| 14 | Request a nonexistent recipe | 404 response with a helpful error message is returned | Verified (PASS) |
+| 15 | Restart the application | Previously saved recipe records remain available in MySQL | Verified (PASS) |
+| 16 | Complete the main workflow through the browser UI | Registration, login, recipe creation, browsing, searching, editing, deleting, and logout work correctly | Verified (PASS) |
+| 17 | Check navigation, labels, and feedback messages | Navigation works correctly and success/error messages are displayed appropriately | Verified (PASS) |
+
+**Note:** Test results should be updated after manually testing each feature. A test should only be marked as passed when the actual result matches the expected result.
 
 ## Known Limitations
 
