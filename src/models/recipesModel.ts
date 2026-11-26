@@ -35,13 +35,14 @@ export async function getRecipes(
     const values: any[] = [];
     if (queryData) {
         const { ingredient, category } = queryData as RecipeFilter;
+        console.log(ingredient,category)
         if (category) {
             query += " AND category = ?";
             values.push(category);
         }
         if (ingredient) {
             query += " AND LOWER(ingredient) LIKE LOWER(?) ";
-            values.push(ingredient);
+            values.push(`%${ingredient}%`);
         }
     }
     try {

@@ -48,6 +48,6 @@ app.all("/{*any}", (req: Request, res: Response) => {
     });
 });
 app.use(errorHandler);
-app.listen(Number.parseInt(PORT), () => {
+app.listen(Number.parseInt(PORT), '0.0.0.0', () => {
     console.log(`Server start on port: ${PORT}`);
 });
