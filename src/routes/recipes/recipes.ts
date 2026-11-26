@@ -17,7 +17,20 @@ recipesRoute
     .route("/")
     .get(async (req, res) => {
         try {
-            const result = await getRecipes(pool);
+            const ingredient =
+                typeof req.query.ingredient === "string"
+                    ? req.query.ingredient
+                    : null;
+
+            const category =
+                typeof req.query.category === "string"
+                    ? req.query.category
+                    : null;
+
+            const result = await getRecipes(pool, {
+                ingredient,
+                category,
+            });
             console.log(result);
             return res.json(result);
         } catch (err) {

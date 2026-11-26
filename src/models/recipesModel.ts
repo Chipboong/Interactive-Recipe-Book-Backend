@@ -20,7 +20,16 @@ export interface RecipeFilter {
     category?: string;
 }
 
-export async function getRecipes(pool: mysql.Pool, queryData = null) {
+export async function getRecipes(
+    pool: mysql.Pool,
+    queryData: {
+        ingredient: string | null;
+        category: string | null;
+    } = {
+        ingredient: null,
+        category: null,
+    },
+) {
     let query =
         "SELECT id, title, description, ingredient, category, prep_time_mins, status, user_id, created_at, image FROM recipes WHERE 1 = 1";
     const values: any[] = [];
