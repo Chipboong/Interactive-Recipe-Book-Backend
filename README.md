@@ -284,60 +284,21 @@ Expected response:
 
 ## Demo Account
 
-There are currently no predefined demo credentials included in the repository.
+Use the following credentials to log in and explore the Interactive Recipe Book application.
 
-To create an account for demonstration purposes, follow these steps:
+| Field | Value |
+|---|---|
+| Email | `test@example.com` |
+| Username | `test` |
+| Password | `Te#a1t3xjL` |
 
-### Step 1: Register an Account
+### Account Information
 
-Send a POST request to:
+- **Username:** test
+- **Email:** test@example.com
+- **Password Hashing:** Argon2id
 
-```text
-http://localhost:3000/api/v1/auth/register
-```
-
-Request body:
-
-```json
-{
-  "username": "demo_user",
-  "email": "demo@example.com",
-  "password": "DemoPassword123!"
-}
-```
-
-Password requirements:
-- At least 8 characters.
-- No more than 128 characters.
-- At least one uppercase letter.
-- At least one lowercase letter.
-- At least one number.
-- At least one special character.
-
-### Step 2: Log In
-
-Send a POST request to:
-
-```text
-http://localhost:3000/api/v1/auth/login
-```
-
-Request body:
-
-```json
-{
-  "email": "demo@example.com",
-  "password": "DemoPassword123!"
-}
-```
-
-The server will set authentication cookies when login succeeds.
-
-### Step 3: Access Protected Features
-
-Use the authentication cookies to access protected endpoints, such as creating or deleting recipes.
-
-**Note:** The example credentials above are instructions for creating a demo account, not an existing account. The authentication cookies are configured with `secure: true` and `sameSite: none`, so local testing over plain HTTP may require a development cookie configuration.
+The password is hashed using Argon2id before being stored in the MySQL database.
 
 ## API Endpoints
 
