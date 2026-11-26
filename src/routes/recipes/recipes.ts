@@ -8,14 +8,20 @@ const recipesRoute : Router = Router();
 
 recipesRoute.route("/")
 .get(async (req, res) => {
+    try{
     const [result] = await getRecipes(pool);
     console.log(result)
-    res.json({...result});
+    return res.json(result);
+    } catch (err){
+        console.log(err)
+    }
 })
 .post(auth_middleware,uploadSingleImage, async (req, res) => {
     const imageBuffer = req.file ? req.file.buffer : null;
+    const userId = (req as any)?.user.user_id;
     const payload = {...req.body,
-        image: imageBuffer
+        image: imageBuffer,
+        user_id: userId
     } as RecipePayload;
     
     try{

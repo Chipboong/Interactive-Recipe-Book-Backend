@@ -2,7 +2,7 @@ import mysql, {
     type ResultSetHeader,
     type RowDataPacket,
 } from "mysql2/promise";
-import { type Request } from "express";
+import { detectImageType } from "../middleware/upload";
 // import { pool } from "../../utils/db.ts"
 
 
@@ -22,29 +22,37 @@ export interface RecipeFilter {
 }
 
 export async function getRecipes(pool: mysql.Pool, queryData = null) {
-    let query = "SELECT id, title, description, category, prep_time_mins, status, user_id, created_at FROM recipes WHERE 1 = 1";
+    let query = "SELECT id, title, description, ingredient, category, prep_time_mins, status, user_id, created_at, image FROM recipes WHERE 1 = 1";
     const values : any[] = [];
     if (queryData){
     const { ingredient, category } = queryData as RecipeFilter;
     if (category) {
-        query += ' AND category = ?';
+        query +=  " AND category = ?";
         values.push(category);
     }
     if (ingredient) {
-        query +=  "AND JSON_CONTAINS( ? )";
+        query +=  " AND LOWER(ingredient) LIKE LOWER(?) ";
         values.push(ingredient);
     }
 }
     try{
-    const [recipes] = await pool.execute<RowDataPacket[]>(query,values);
-    return recipes;
+    const [rows] = await pool.execute<RowDataPacket[]>(query,values);
+    return rows.map((row) => {
+      const mime = row.image ? detectImageType(row.image) || "image/jpeg" : null;
+      return {
+        ...row,
+        image: row.image
+          ? `data:${mime};base64,${row.image.toString("base64")}`
+          : null,
+      };
+    });
 } catch (err:any) {
     return err.message;
 }
 }
 
 export async function getRecipeById(pool: mysql.Pool, id: number) {
- const query = "SELECT title, description, category, prep_time_mins, status, user_id, created_at FROM recipes WHERE id = ? LIMIT 1;";
+ const query = "SELECT id, title, description, category, prep_time_mins, status, user_id, created_at FROM recipes WHERE id = ? LIMIT 1;";
  try{
     const [rows] = await pool.execute<RowDataPacket[]>(query,[id])
     return rows.length > 0 ? rows[0] : null;
@@ -60,18 +68,29 @@ export async function uploadRecipe(pool: mysql.Pool , data : RecipePayload) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [
         data.title,
-        data.description,
-        data.category,
-        data.prep_time_mins,
-        data.ingredient,
-        data.image,
-        data.status || 'draft', 
+        data.description ?? null,
+        data.category ?? null,
+        data.prep_time_mins ?? null,
+        data.ingredient ?? null,
+        data.image ?? null,
+        data.status || 'draft',
         data.user_id
     ];
     try{
         const [ result ] = await pool.execute<ResultSetHeader>(stmt,values);
         return result.insertId;
     } catch (err: any) {
+        console.log("Recipe values:", {
+  title: data.title,
+  description: data.description,
+  category: data.category,
+  prep_time_mins: data.prep_time_mins,
+  ingredient: data.ingredient,
+  hasImage: Boolean(data.image),
+  status: data.status || 'draft',
+  user_id: data.user_id,
+});
+        console.log(err)
         throw err;
     }
 
